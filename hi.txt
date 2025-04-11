@@ -1,0 +1,137 @@
+CREATE DATABASE RiceShopManagement;
+
+USE RiceShopManagement;
+
+CREATE TABLE purchase_details (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_name VARCHAR(255) NOT NULL,
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    purchase_date DATE NOT NULL
+);
+
+
+
+
+<?php
+// Database connection
+$server = "localhost";
+$username = "root";
+$password = "";
+$database = "RiceShopManagement";
+
+$conn = new mysqli($server, $username, $password, $database);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Add purchase details
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $product_name = $_POST['product_name'];
+    $quantity = $_POST['quantity'];
+    $price = $_POST['price'];
+    $purchase_date = $_POST['purchase_date'];
+
+    $sql = "INSERT INTO purchase_details (product_name, quantity, price, purchase_date) VALUES ('$product_name', '$quantity', '$price', '$purchase_date')";
+    $conn->query($sql);
+}
+
+// Fetch purchase details
+$result = $conn->query("SELECT * FROM purchase_details");
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rice Shop Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="number"], input[type="date"] {
+            padding: 5px;
+            margin: 5px 0;
+            width: 100%;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rice Shop Management - Purchase Details</h1>
+    
+    <form method="POST" action="">
+        <label for="product_name">Product Name:</label>
+        <input type="text" id="product_name" name="product_name" required>
+
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" required>
+
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price" step="0.01" required>
+
+        <label for="purchase_date">Purchase Date:</label>
+        <input type="date" id="purchase_date" name="purchase_date" required>
+
+        <button type="submit">Add Purchase</button>
+    </form>
+
+    <h2>Purchase Records</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Purchase Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    echo "<tr>
+                        <td>{$row['id']}</td>
+                        <td>{$row['product_name']}</td>
+                        <td>{$row['quantity']}</td>
+                        <td>\${$row['price']}</td>
+                        <td>{$row['purchase_date']}</td>
+                    </tr>";
+                }
+            } else {
+                echo "<tr><td colspan='5'>No records found</td></tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+</body>
+</html>
